@@ -19,7 +19,7 @@ const Navigate = () => {
               path="/"
               element={
                   <React.Suspense >
-                      {/* <Login/> */}
+                      {/* <Uipages/> */}
                   {getuserdata?.token ? <Uipages/> : <Login/>}
                 </React.Suspense>
               }

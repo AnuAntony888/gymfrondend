@@ -1,6 +1,7 @@
 import React from "react";
 import { TypographyText } from "../Reuse/Reuse";
 import { Box, Grid, Paper } from "@mui/material";
+import { Users } from "./Users";
 
 const Dashboard = () => (
   <Box >
@@ -21,8 +22,10 @@ const Dashboard = () => (
             style={{ width: "100%", height: "auto", borderRadius: "8px" }}
           />
     
+        
       </Grid>
-
+   
+      
       {/* Dashboard Content */}
       <Grid item xs={12} md={6}>
         <Paper elevation={3} sx={{ p: 2 }}>

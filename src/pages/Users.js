@@ -1,25 +1,46 @@
-import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, useTheme } from '@mui/material';
-import React, { useState } from 'react';
-import { Toastsucess, TypographyText } from '../Reuse/Reuse';
-import { useCustomerField } from '../API/CustomerApi';
-import { useAuthContext } from '../Context/AuthContext';
-import ThemeProvider, { useThemeContext } from '../Reuse/ThemeProvider';
+import {
+  Button,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  Paper,
+  Radio,
+  RadioGroup,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  useTheme,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Toastsucess, TypographyText } from "../Reuse/Reuse";
+import { GetAllCustomer, useCustomerField } from "../API/CustomerApi";
+import { useAuthContext } from "../Context/AuthContext";
+import ThemeProvider, { useThemeContext } from "../Reuse/ThemeProvider";
+import Box from "@mui/material/Box";
 
 export const Users = () => {
   const [errors, setErrors] = useState({});
-  const [customername, setCustomername] = useState('');
-  const [customeremail, setCustomeremail] = useState('');
-  const [customerphone, setCustomerphone] = useState('');
-  const [customeraddress, setCustomeraddress] = useState('');
-  const [customerstatus, setCustomerstatus] = useState('');
+  const [customername, setCustomername] = useState("");
+  const [customeremail, setCustomeremail] = useState("");
+  const [customerphone, setCustomerphone] = useState("");
+  const [customeraddress, setCustomeraddress] = useState("");
+  const [customerstatus, setCustomerstatus] = useState("");
   const { getuserdata } = useAuthContext();
   const { InserCustomer } = useCustomerField();
-
+  const { getcustomer, isLoadingrefetch } = GetAllCustomer(getuserdata);
+  console.log(getcustomer, "getcustomer");
+  useEffect(() => {
+    isLoadingrefetch();
+  }, [isLoadingrefetch]);
   const handlecustomername = (e) => {
     if (!e.target.value) {
-      setErrors((errors) => ({ ...errors, customername: 'Name is required' }));
+      setErrors((errors) => ({ ...errors, customername: "Name is required" }));
     } else {
-      setErrors((errors) => ({ ...errors, customername: '' }));
+      setErrors((errors) => ({ ...errors, customername: "" }));
     }
     setCustomername(e.target.value);
   };
@@ -27,11 +48,11 @@ export const Users = () => {
   const handlecustomeremail = (e) => {
     const value = e.target.value;
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-    let errorMsg = '';
+    let errorMsg = "";
     if (!value) {
-      errorMsg = 'Email is required';
+      errorMsg = "Email is required";
     } else if (!regex.test(value)) {
-      errorMsg = 'Invalid email address';
+      errorMsg = "Invalid email address";
     }
     setErrors((errors) => ({ ...errors, customeremail: errorMsg }));
     setCustomeremail(value);
@@ -40,11 +61,13 @@ export const Users = () => {
   const handlecustomerphone = (e) => {
     if (!e.target.value) {
       setErrors((errors) => ({
-        ...errors, customerphone: 'Phone number is required'
+        ...errors,
+        customerphone: "Phone number is required",
       }));
     } else {
       setErrors((errors) => ({
-        ...errors, customerphone: ''
+        ...errors,
+        customerphone: "",
       }));
     }
     setCustomerphone(e.target.value);
@@ -53,11 +76,13 @@ export const Users = () => {
   const handlecustomeraddress = (e) => {
     if (!e.target.value) {
       setErrors((errors) => ({
-        ...errors, customeraddress: 'Address is required'
+        ...errors,
+        customeraddress: "Address is required",
       }));
     } else {
       setErrors((errors) => ({
-        ...errors, customeraddress: ''
+        ...errors,
+        customeraddress: "",
       }));
     }
     setCustomeraddress(e.target.value);
@@ -90,7 +115,9 @@ export const Users = () => {
       formData.append("user_id", getuserdata?.userId);
 
       const response = await InserCustomer(formData);
+
       Toastsucess(response.message, "success", "light");
+      isLoadingrefetch();
       setCustomername("");
       setCustomeremail("");
       setCustomerphone("");
@@ -109,118 +136,180 @@ export const Users = () => {
       type: "text",
       value: customername,
       onChange: handlecustomername,
-      errorKey: 'customername' // Key for error state
+      errorKey: "customername", // Key for error state
     },
     {
       txt: "Email",
       value: customeremail,
       type: "email",
       onChange: handlecustomeremail,
-      errorKey: 'customeremail' // Key for error state
+      errorKey: "customeremail", // Key for error state
     },
     {
       txt: "Phone",
       value: customerphone,
       type: "text",
       onChange: handlecustomerphone,
-      errorKey: 'customerphone' // Key for error state
+      errorKey: "customerphone", // Key for error state
     },
     {
       txt: "Address",
       value: customeraddress,
       type: "text",
       onChange: handlecustomeraddress,
-      errorKey: 'customeraddress' // Key for error state
-    }
+      errorKey: "customeraddress", // Key for error state
+    },
   ];
 
   const { mode } = useThemeContext(); // Get the theme mode
-  const theme = useTheme(); // Access the current theme 
-  console.log('Background:', theme.palette.background.default);
-  console.log('Text Primary:', theme.palette.text.primary);
-  console.log('Button Main:', theme.palette.button?.main);
+  const theme = useTheme(); // Access the current theme
+  console.log("Background:", theme.palette.background.default);
+  console.log("Text Primary:", theme.palette.text.primary);
+  console.log("Button Main:", theme.palette.button?.main);
   return (
-    <Grid container spacing={2} sx={{ p: '3%' }}>
-      <Grid item xs={12}>
-        <TypographyText
-          Typography={"Add New Member"}
-          fontSize="1.5rem"
-          fontWeight="600"
-        />
-      </Grid>
-      {Customer.map((data, index) => (
-        <Grid item lg={6} xs={12} md={6} sm={6} key={index}>
+    <React.Fragment>
+      <Grid container spacing={2} sx={{ p: "3%" }}>
+        <Grid item xs={12}>
           <TypographyText
-            Typography={data.txt}
-            textAlign="left"
-            fontSize=".8rem"
+            Typography={"Add New Member"}
+            fontSize="1.5rem"
+            fontWeight="600"
           />
-
-          <input
-            type={data.type}
-            value={data.value}
-            onChange={data.onChange}
-            required
-            style={{
-              height: "35px",
-              width: "100%",
-              border: ".5px solid",
-              borderRadius:'5px'
-            }}
-          />
-          {errors[data.errorKey] && ( // Access error using errorKey
-            <TypographyText
-              Typography={errors[data.errorKey]} // Use error key to get the error message
-              color="red"
-              textAlign="left"
-              textTransform="lowercase"
-            />
-          )}
         </Grid>
-      ))}
-      <Grid item xs={12}>
-        <FormControl component="fieldset">
-        <TypographyText
-            Typography={'Option'}
-            textAlign="left"
-            fontSize=".8rem"
-          />
-          {/* <FormLabel component="legend">Status</FormLabel> */}
-          <RadioGroup
-            row
-            value={customerstatus}
-            onChange={handlecustomerstatus}
-          >
-            <FormControlLabel value="self" control={<Radio />} label="Self Training" />
-            <FormControlLabel value="personal" control={<Radio />} label="Personal Trainer" />
-          </RadioGroup>
-          {errors.customerstatus && (
+        {Customer.map((data, index) => (
+          <Grid item lg={6} xs={12} md={6} sm={6} key={index}>
             <TypographyText
-              Typography={errors.customerstatus}
-              color="red"
+              Typography={data.txt}
               textAlign="left"
-              textTransform="lowercase"
+              fontSize=".8rem"
             />
-          )}
-        </FormControl>
+
+            <input
+              type={data.type}
+              value={data.value}
+              onChange={data.onChange}
+              required
+              style={{
+                height: "35px",
+                width: "100%",
+                border: ".5px solid",
+                borderRadius: "5px",
+              }}
+            />
+            {errors[data.errorKey] && ( // Access error using errorKey
+              <TypographyText
+                Typography={errors[data.errorKey]} // Use error key to get the error message
+                color="red"
+                textAlign="left"
+                textTransform="lowercase"
+              />
+            )}
+          </Grid>
+        ))}
+        <Grid item xs={12}>
+          <FormControl component="fieldset">
+            <TypographyText
+              Typography={"Option"}
+              textAlign="left"
+              fontSize=".8rem"
+            />
+            {/* <FormLabel component="legend">Status</FormLabel> */}
+            <RadioGroup
+              row
+              value={customerstatus}
+              onChange={handlecustomerstatus}
+            >
+              <FormControlLabel
+                value="self"
+                control={<Radio />}
+                label="Self Training"
+              />
+              <FormControlLabel
+                value="personal"
+                control={<Radio />}
+                label="Personal Trainer"
+              />
+            </RadioGroup>
+            {errors.customerstatus && (
+              <TypographyText
+                Typography={errors.customerstatus}
+                color="red"
+                textAlign="left"
+                textTransform="lowercase"
+              />
+            )}
+          </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            type="submit"
+            sx={{
+              textAlign: "left",
+              minWidth: "240px",
+              textTransform: "capitalize",
+              margin: "auto",
+              backgroundColor:
+                mode === "light"
+                  ? theme.palette.button?.main
+                  : theme.palette.button?.main, // primary color
+            }}
+            onClick={handleinsertcustomer}
+          >
+            Add
+          </Button>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Button
-          variant="contained"
-          type="submit"
-          sx={{
-            textAlign: "left",
-            minWidth: '240px',
-            textTransform: "capitalize",
-            margin: "auto",
-            backgroundColor: mode === 'light'?theme.palette.button?.main:theme.palette.button?.main, // primary color
-        
-          }}
-          onClick={handleinsertcustomer}
-        >
-          Add
-        </Button>
-      </Grid>
-    </Grid>
+
+      <TableContainer component={Paper} style={{ overflow: 'auto' }}>
+        <Table aria-label="caption table">
+          <TableHead>
+            <TableRow>
+              {EmployeeDetails.map((data, index) => (
+                <TableCell className="shadow-checkoutCardheading" key={index}
+                sx={{width:'100px'}}>
+                  {data.txt}
+                </TableCell>
+              ))}{" "}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {getcustomer?.map((data,index) => (
+              <TableRow key={data.product_id} >
+                <TableCell component="th" scope="row">
+                  {index + 1 }
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data.customerName}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data.customerContactNo}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data.customerEmail}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data.customerAddress}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data.customerOption}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+    </React.Fragment>
   );
 };
+const EmployeeDetails = [
+  {
+    txt: "Id",
+  },
+  { txt: "Name" },
+  { txt: "Contact" },
+  { txt: "Email" },
+  { txt: "Address" },
+  { txt: "Option" },
+];

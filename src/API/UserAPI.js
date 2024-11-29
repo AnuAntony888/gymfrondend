@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useMutation } from "react-query";
 
-export const API_URL="https://gymbackend-chi.vercel.app/api"
+// export const API_URL="https://gymbackend-taupe.vercel.app/api"
+
+export const API_URL="http://localhost:5000/api"
 //Login
 const loginHandler = async (params) => {
     try {

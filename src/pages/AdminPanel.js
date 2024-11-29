@@ -19,6 +19,10 @@ import { Toastsucess } from "../Reuse/Reuse";
 import { useAuthContext } from "../Context/AuthContext";
 import { useLogout } from "../API/UserAPI";
 import { Users } from "./Users";
+import { MasterData } from "./MasterData";
+import { EmployeeData } from "./EmployeeData";
+
+
 
 const AdminPanel = () => {
   const theme = useTheme();
@@ -27,7 +31,7 @@ const AdminPanel = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isMobile);
   const { getuserdata } = useAuthContext();
   const [activeSection, setActiveSection] = useState("Dashboard");
-
+  console.log(getuserdata, "getuserdata ");
   const { logout } = useLogout(getuserdata);
 
   const handleLogout = async () => {
@@ -50,6 +54,23 @@ const AdminPanel = () => {
     { label: "Dashboard", icon: <DashboardIcon />, content: <Dashboard /> },
     { label: "Add Member", icon: <PeopleIcon />, content: <Users /> },
     { label: "Themes", icon: <ThemeIcon />, content: <Themes /> },
+    
+      getuserdata.Rolles === 'admin' ? {
+        label: "Add Master",
+        icon: <ThemeIcon />,
+        content: <MasterData />
+      } : null
+    
+,    
+    
+
+getuserdata.Rolles === 'hr' ? {
+  label: "Add Employee",
+  icon: <ThemeIcon />,
+  content: <EmployeeData/>
+} : null
+
+,    
     {
       label: "Logout",
       icon: <LogoutIcon />,
@@ -66,7 +87,7 @@ const AdminPanel = () => {
         </Button>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   const renderContent = () => {
     const activeItem = sidebarItems.find((item) => item.label === activeSection);
